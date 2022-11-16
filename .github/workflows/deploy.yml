@@ -1,0 +1,65 @@
+name: 'CICD FOR CPET'
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs: 
+  build:
+    strategy:
+      matrix:
+        node-version: [14.x]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: use nodejs
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{matrix.node-version}}
+      - name: build site
+        run: |
+          docker build -t cpet .
+        env: 
+          CI: true
+
+  deploy:
+    timeout-minutes: 10
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: connect to SSH
+        uses: appleboy/ssh-action@master
+        with:
+            host: ${{secrets.HOST}}     
+            username: ${{secrets.USER}}  
+            PORT: ${{secrets.PORT}}  
+            KEY: ${{secrets.KEY}}     
+            script: |
+                whoami
+                cd  ./cicd-test
+                git pull origin vegitables
+                sudo docker stop $(docker ps -a -q)
+                sudo docker rm $(docker ps -a -q)
+                sudo docker-compose -f "docker-compose.yml" up -d --build
+      - name: Send some mail
+        uses: wadeww/send-email-action@master
+        with:
+          server_address: smtp.gmail.com
+          port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: Workflow finished
+          body: Job completed ${{job.status}}
+          to: muhammedfayiscc@gmail.com
+          from: Me
+      - name: Notify slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: pullreminders/slack-action@master
+        with:
+          args: '{\"channel\":\"C04AG5YP6KY\",\"text\":\"build completed,status is ${{job.status}}\"}'
+      - name: exit
+        run: |
+          echo 'deployment completed.' 
