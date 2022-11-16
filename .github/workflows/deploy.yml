@@ -41,7 +41,8 @@ jobs:
                 cd  ./cpet-test
                 git pull origin master
                 sudo docker stop cpet
-                sudo docker rm cpet
+                sudo docker container ls
+                sudo docker rm -f cpet
                 sudo docker build -t cpet .
                 sudo docker run -p 80:80 cpet
       - name: Send some mail
