@@ -38,7 +38,7 @@ jobs:
             KEY: ${{secrets.KEY}}     
             script: |
                 whoami
-                cd  ./CPET
+                cd  ./cpet-test
                 git pull origin master
                 sudo docker stop $(docker ps -a -q)
                 sudo docker rm $(docker ps -a -q)
