@@ -38,11 +38,12 @@ jobs:
             KEY: ${{secrets.KEY}}     
             script: |
                 whoami
-                cd  ./cicd-test
-                git pull origin vegitables
+                cd  ./CPET
+                git pull origin master
                 sudo docker stop $(docker ps -a -q)
                 sudo docker rm $(docker ps -a -q)
-                sudo docker-compose -f "docker-compose.yml" up -d --build
+                sudo docker build -t cpet .
+                sudo docker run -p 80:80 cpet
       - name: Send some mail
         uses: wadeww/send-email-action@master
         with:
@@ -54,12 +55,6 @@ jobs:
           body: Job completed ${{job.status}}
           to: muhammedfayiscc@gmail.com
           from: Me
-      - name: Notify slack
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        uses: pullreminders/slack-action@master
-        with:
-          args: '{\"channel\":\"C04AG5YP6KY\",\"text\":\"build completed,status is ${{job.status}}\"}'
       - name: exit
         run: |
           echo 'deployment completed.' 
