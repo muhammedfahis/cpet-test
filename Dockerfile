@@ -13,5 +13,5 @@ RUN npm start
 
 FROM nginx 
 EXPOSE 80
-COPY --from=buildFile /var/app/client/build/ /usr/share/nginx/html
+
 
