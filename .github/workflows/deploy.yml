@@ -42,6 +42,7 @@ jobs:
                 git pull origin master
                 sudo docker stop cpet
                 sudo docker container ls
+                sudo docker rm -f cpet
                 sudo docker-compose up
       - name: Send some mail
         uses: wadeww/send-email-action@master
