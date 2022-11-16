@@ -12,6 +12,6 @@ RUN npm start
 
 
 FROM nginx 
-EXPOSE 80
+# EXPOSE 80
 
 
