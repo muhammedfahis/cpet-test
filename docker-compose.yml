@@ -1,15 +1,25 @@
 version: "3"
 services:
     prod:
+      restart: always
       container_name: cpet
       build: 
           context: .
           dockerfile: Dockerfile
       ports:
-          - "80:80"
+          - "5200:5200"
       volumes:
             - /var/app/node_modules
             - .:/var/app
+    react:
+      restart: always
+      container_name: cpet-react
+      build: ./client
+      ports:
+          - "80:80"
+      volumes:
+            - /var/www/node_modules
+            - .:/var/www/build
 
 
 
