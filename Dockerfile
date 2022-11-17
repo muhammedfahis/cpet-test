@@ -17,7 +17,7 @@ FROM nginx:alpine
 COPY --from=buildFile /var/app/nginx/nginx.conf /etc/nginx/nginx.conf
 RUN rm -rf /usr/share/nginx/html/*
 
-EXPOSE 3000 80
+EXPOSE 3000 80 5200
 COPY --from=buildFile /var/app/client/build/ /usr/share/nginx/html
 VOLUME /usr/share/nginx/html
 VOLUME /etc/nginx
