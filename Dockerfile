@@ -1,12 +1,10 @@
-FROM ubuntu
+FROM node:14
 
-FROM node:14-alpine as buildFile
-WORKDIR /var/app
+WORKDIR /app/api
 COPY package.json .
 RUN npm install
-RUN npm i -g pm2
 COPY . .
-CMD [ "npm","start" ]
+CMD ["npm", "start"]
 
 
 

@@ -1,22 +1,21 @@
-FROM ubuntu
+# Stage 1
+FROM node:14 as build-stage
 
-FROM node:14-alpine as buildFile
-WORKDIR /var/www
-RUN npm i -g pm2
+WORKDIR /app/ui
+COPY package.json .
+RUN npm install
 COPY . .
 
+ARG REACT_APP_API_BASE_URL
+ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
+RUN npm run build
 
+# Stage 2
+FROM nginx:latest
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --from=build-stage /app/ui/build /usr/share/nginx/html
+VOLUME [ "/usr/share/nginx/html" ]
+EXPOSE $REACT_DOCKER_PORT
 
-
-
-
-FROM nginx:alpine
-COPY --from=buildFile /var/www/nginx/nginx.conf /etc/nginx/nginx.conf
-RUN rm -rf /usr/share/nginx/html/*
-
-EXPOSE  80 5200
-COPY --from=buildFile /var/www/build/ /usr/share/nginx/html
-VOLUME /usr/share/nginx/html
-VOLUME /etc/nginx
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]
